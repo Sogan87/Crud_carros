@@ -1,29 +1,46 @@
 const carroService = require('../services/carroServices');
 
 module.exports = {
-    buscarTodos: async (req, res) =>{
-        let json = {error: '', result:[]};
-
-        let carros = await carroService.buscarTodos();
-
-        for(let i in carros){
-            json.result.push({
-                codigo: carros[i].codigo,
-                descricao: carros[i].modelo,
-
-            });
+    buscarTodos: async (req, res) => {
+        let json = { error: '', result: [] };
+    
+        let { parametro } = req.query;
+    
+        if (parametro) {
+            // Buscar carros que contenham o parâmetro no modelo ou na placa
+            let carros = await carroService.buscarPorParametro(parametro);
+    
+            for (let i in carros) {
+                json.result.push({
+                    codigo: carros[i].codigo,
+                    descricao: carros[i].modelo
+                });
+            }
+        } else {
+            // Buscar todos os carros
+            let carros = await carroService.buscarTodos();
+    
+            for (let i in carros) {
+                json.result.push({
+                    codigo: carros[i].codigo,
+                    descricao: carros[i].modelo
+                });
+            }
         }
+    
         res.json(json);
     },
-    buscarUm: async (req, res) =>{
-        let json = {error: '', result:{}};
+    
+    buscarUm: async (req, res) => {
+        let json = { error: '', result: {} };
         let codigo = req.params.codigo;
         let carro = await carroService.buscarUm(codigo);
-        if(carro){
+        if (carro) {
             json.result = carro;
         }
         res.json(json);
     },
+    
     inserir: async(req, res) => {
         let json = {error:'', result:{}};
 
